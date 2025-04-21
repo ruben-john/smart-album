@@ -12,15 +12,9 @@ services:
       - key: PORT
         value: 8080
       - key: GOOGLE_CLOUD_PROJECT_ID
-        fromService:
-          type: env
-          name: smart-album-env
-          key: GOOGLE_CLOUD_PROJECT_ID
+        sync: false
       - key: STORAGE_BUCKET_NAME
-        fromService:
-          type: env
-          name: smart-album-env
-          key: STORAGE_BUCKET_NAME
+        sync: false
       - key: FACE_SIMILARITY_THRESHOLD
         value: 0.6
       - key: ALLOWED_ORIGINS
@@ -43,12 +37,3 @@ services:
           name: smart-album-backend
           property: url
           append: /api
-
-  # Shared environment variables
-  - type: env
-    name: smart-album-env
-    envVars:
-      - key: GOOGLE_CLOUD_PROJECT_ID
-        sync: false
-      - key: STORAGE_BUCKET_NAME
-        sync: false
