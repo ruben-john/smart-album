@@ -18,10 +18,7 @@ services:
       - key: FACE_SIMILARITY_THRESHOLD
         value: 0.6
       - key: ALLOWED_ORIGINS
-        fromService:
-          type: web
-          name: smart-album-frontend
-          property: url
+        sync: false
 
   # Frontend web service
   - type: web
@@ -32,8 +29,4 @@ services:
     plan: free
     envVars:
       - key: REACT_APP_API_URL
-        fromService:
-          type: web
-          name: smart-album-backend
-          property: url
-          append: /api
+        sync: false
