@@ -18,17 +18,35 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies with canvas rebuild
 RUN npm ci
 
 # Copy source files
 COPY . .
 
-# Build TypeScript (if your backend uses TypeScript)
+# Special handling for canvas
+RUN npm rebuild canvas --update-binary
+
+# Build TypeScript
 RUN npm run build
+
+# Add a script to fix canvas issues
+RUN echo '#!/bin/sh\n\
+echo "Checking for canvas in node_modules..."\n\
+if [ -d "node_modules/canvas" ]; then\n\
+  echo "Canvas found. Running rebuild..."\n\
+  npm rebuild canvas --update-binary\n\
+else\n\
+  echo "Canvas not found. Installing..."\n\
+  npm install canvas\n\
+fi\n\
+\n\
+echo "Starting application..."\n\
+node dist/index.js\n\
+' > /app/start.sh && chmod +x /app/start.sh
 
 # Expose port
 EXPOSE 8080
 
-# Start server
-CMD ["npm", "start"]
+# Start server with canvas fix script
+CMD ["/app/start.sh"]
