@@ -1,6 +1,6 @@
 FROM node:20-slim
 
-# Install canvas dependencies
+# Install dependencies for canvas and face-api.js
 RUN apt-get update && apt-get install -y \
     build-essential \
     libcairo2-dev \
@@ -24,7 +24,7 @@ RUN npm ci
 # Copy source files
 COPY . .
 
-# Build TypeScript
+# Build TypeScript (if your backend uses TypeScript)
 RUN npm run build
 
 # Expose port

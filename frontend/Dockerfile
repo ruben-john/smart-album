@@ -15,22 +15,25 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:stable-alpine
+FROM nginx:alpine
 
 # Copy built assets
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.template
+# Create nginx configuration that works with Render
+RUN echo 'server { \
+    listen $PORT; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf.template
 
-# Script to replace PORT variable and start nginx
+# Script to replace PORT in nginx config
 RUN echo '#!/bin/sh\n\
-PORT="${PORT:-80}"\n\
-sed "s/{{PORT}}/$PORT/g" /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf\n\
+envsubst \$PORT < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf\n\
 nginx -g "daemon off;"' > /docker-entrypoint.sh && \
 chmod +x /docker-entrypoint.sh
-
-# Expose the port
-EXPOSE 80
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

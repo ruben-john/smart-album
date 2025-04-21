@@ -14,7 +14,7 @@ services:
       - key: GOOGLE_CLOUD_PROJECT_ID
         sync: false
       - key: STORAGE_BUCKET_NAME
-        sync: false
+        value: smart-album-photos
       - key: FACE_SIMILARITY_THRESHOLD
         value: 0.6
       - key: ALLOWED_ORIGINS
