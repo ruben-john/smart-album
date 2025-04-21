@@ -1,0 +1,47 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "docker-build": "npm install sharp && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "download-face-models": "node scripts/download-face-models.js",
+    "generate-hashes": "ts-node src/scripts/generateHashes.ts",
+    "fix-canvas": "node scripts/fix-canvas-windows.js",
+    "setup-face-recognition": "node scripts/setup-face-recognition.js",
+    "clean-rebuild-canvas": "node scripts/clean-rebuild-canvas.js",
+    "use-prebuilt-canvas": "node scripts/use-prebuilt-canvas.js",
+    "fix-win-node16": "node scripts/windows-node16-fixes.js",
+    "fix-face-api": "node scripts/fix-face-api-on-windows.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@google-cloud/firestore": "^7.11.0",
+    "@google-cloud/storage": "^7.15.2",
+    "@google-cloud/vision": "^4.3.3",
+    "@napi-rs/canvas": "^0.1.44",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "face-api.js": "^0.22.2",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.32.6",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.13.10",
+    "@types/uuid": "^10.0.0",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "blurhash": "^2.0.5",
+    "canvas": "^2.11.2",
+    "sharp": "^0.33.5",
+    "uuid": "^11.1.0"
+  }
+}

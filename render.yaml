@@ -1,0 +1,54 @@
+services:
+  # Backend API service
+  - type: web
+    name: smart-album-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8080
+      - key: GOOGLE_CLOUD_PROJECT_ID
+        fromService:
+          type: env
+          name: smart-album-env
+          key: GOOGLE_CLOUD_PROJECT_ID
+      - key: STORAGE_BUCKET_NAME
+        fromService:
+          type: env
+          name: smart-album-env
+          key: STORAGE_BUCKET_NAME
+      - key: FACE_SIMILARITY_THRESHOLD
+        value: 0.6
+      - key: ALLOWED_ORIGINS
+        fromService:
+          type: web
+          name: smart-album-frontend
+          property: url
+
+  # Frontend web service
+  - type: web
+    name: smart-album-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: smart-album-backend
+          property: url
+          append: /api
+
+  # Shared environment variables
+  - type: env
+    name: smart-album-env
+    envVars:
+      - key: GOOGLE_CLOUD_PROJECT_ID
+        sync: false
+      - key: STORAGE_BUCKET_NAME
+        sync: false

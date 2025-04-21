@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Album API Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .photo-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .photo-info {
+            padding: 12px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Album API Test</h1>
+    
+    <div>
+        <label for="api-url">API URL:</label>
+        <input type="text" id="api-url" value="https://f6f6-122-187-117-179.ngrok-free.app/api" style="width: 300px;">
+        <button id="test-connection">Test Connection</button>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <button id="fetch-photos">Fetch Photos</button>
+        <button id="fetch-face-groups">Fetch Face Groups</button>
+    </div>
+    
+    <div id="status" style="margin-top: 20px;"></div>
+    
+    <pre id="response"></pre>
+    
+    <div class="photo-grid" id="photos-container"></div>
+    
+    <script>
+        document.getElementById('test-connection').addEventListener('click', async function() {
+            const apiUrl = document.getElementById('api-url').value;
+            const statusEl = document.getElementById('status');
+            const responseEl = document.getElementById('response');
+            
+            statusEl.innerHTML = 'Testing connection...';
+            
+            try {
+                const response = await axios.get(`${apiUrl}`);
+                statusEl.innerHTML = '<span style="color: green;">✅ Connection successful</span>';
+                responseEl.textContent = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                statusEl.innerHTML = '<span style="color: red;">❌ Connection failed</span>';
+                responseEl.textContent = JSON.stringify(error, null, 2);
+                console.error('Error:', error);
+            }
+        });
+        
+        document.getElementById('fetch-photos').addEventListener('click', async function() {
+            const apiUrl = document.getElementById('api-url').value;
+            const statusEl = document.getElementById('status');
+            const responseEl = document.getElementById('response');
+            const photosContainerEl = document.getElementById('photos-container');
+            
+            statusEl.innerHTML = 'Fetching photos...';
+            photosContainerEl.innerHTML = '';
+            
+            try {
+                const response = await axios.get(`${apiUrl}/photos`);
+                statusEl.innerHTML = `<span style="color: green;">✅ Retrieved ${response.data.length} photos</span>`;
+                responseEl.textContent = JSON.stringify(response.data.slice(0, 2), null, 2) + (response.data.length > 2 ? '\n... (truncated)' : '');
+                
+                // Display photos
+                response.data.forEach(photo => {
+                    const photoCard = document.createElement('div');
+                    photoCard.className = 'photo-card';
+                    
+                    const img = document.createElement('img');
+                    img.src = photo.thumbnailUrl || photo.url;
+                    img.alt = photo.filename || 'Photo';
+                    
+                    const photoInfo = document.createElement('div');
+                    photoInfo.className = 'photo-info';
+                    photoInfo.textContent = photo.filename || 'Untitled';
+                    
+                    photoCard.appendChild(img);
+                    photoCard.appendChild(photoInfo);
+                    photosContainerEl.appendChild(photoCard);
+                });
+            } catch (error) {
+                statusEl.innerHTML = '<span style="color: red;">❌ Failed to fetch photos</span>';
+                responseEl.textContent = JSON.stringify(error, null, 2);
+                console.error('Error fetching photos:', error);
+            }
+        });
+        
+        document.getElementById('fetch-face-groups').addEventListener('click', async function() {
+            const apiUrl = document.getElementById('api-url').value;
+            const statusEl = document.getElementById('status');
+            const responseEl = document.getElementById('response');
+            
+            statusEl.innerHTML = 'Fetching face groups...';
+            
+            try {
+                const response = await axios.get(`${apiUrl}/face-groups`);
+                statusEl.innerHTML = `<span style="color: green;">✅ Retrieved ${response.data.length} face groups</span>`;
+                responseEl.textContent = JSON.stringify(response.data.slice(0, 2), null, 2) + (response.data.length > 2 ? '\n... (truncated)' : '');
+            } catch (error) {
+                statusEl.innerHTML = '<span style="color: red;">❌ Failed to fetch face groups</span>';
+                responseEl.textContent = JSON.stringify(error, null, 2);
+                console.error('Error fetching face groups:', error);
+            }
+        });
+    </script>
+</body>
+</html> 
