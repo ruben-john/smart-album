@@ -14,26 +14,20 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
+# Production stage - using a lightweight server instead of nginx
+FROM node:20-alpine
 
-# Copy built assets
-COPY --from=build /app/build /usr/share/nginx/html
+WORKDIR /app
 
-# Create nginx configuration that works with Render
-RUN echo 'server { \
-    listen $PORT; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    location / { \
-        try_files $uri $uri/ /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf.template
+# Install a simple static file server
+RUN npm install -g serve
 
-# Script to replace PORT in nginx config
-RUN echo '#!/bin/sh\n\
-envsubst \$PORT < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf\n\
-nginx -g "daemon off;"' > /docker-entrypoint.sh && \
-chmod +x /docker-entrypoint.sh
+# Copy built files
+COPY --from=build /app/build .
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+# Create a proper startup script
+RUN echo '#!/bin/sh\nserve -s -l ${PORT:-3000}' > start.sh && \
+    chmod +x start.sh
+
+# Start the server
+CMD ["./start.sh"]
